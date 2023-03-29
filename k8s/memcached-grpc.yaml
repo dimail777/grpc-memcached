@@ -1,0 +1,52 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: memcached-grpc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: memcached-grpc
+  template:
+    metadata:
+      labels:
+        app: memcached-grpc
+    spec:
+      initContainers:
+        - name: wait-for-memcached
+          image: busybox
+          command: ['sh', '-c', 'until nc -z -v -w30 memcached-store 11211; do echo "waiting for memcached"; sleep 5; done;']
+      containers:
+        - name:  memcached-grpc
+          image: grpc.com/memcached
+          ports:
+            - containerPort: 50051
+          env:
+            - name: MODE
+              value: "memcached"
+            - name: MEMCACHED_HOST
+              value: "memcached-store"
+            - name: MEMCACHED_TCP_TIMEOUT
+              value: "5s"
+            - name: MEMCACHED_PORT
+              value: "11211"
+            - name: MEMCACHED_MAX_CONNECTIONS
+              value: "16"
+            - name: MEMCACHED_MAX_WAIT_CONNECTION
+              value: "5s"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: memcached-grpc
+spec:
+  type: NodePort
+  selector:
+    app: memcached-grpc
+  ports:
+    - protocol: TCP
+      port: 50051
+      targetPort: 50051
+      nodePort: 50051
