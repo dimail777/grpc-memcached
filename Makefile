@@ -15,7 +15,7 @@ app-build-docker:
 
 e2e-test-bin:
 	echo "Building e2e binaries for all required OS and Platforms"
-	GOOS=linux GOARCH=arm CGO_ENABLED=0 go build -o cmd/e2e/bin/e2e-linux-arm cmd/server/main.go
-	GOOS=linux GOARCH=386 CGO_ENABLED=0 go build -o cmd/e2e/bin/e2e-linux-386 cmd/server/main.go
+	GOOS=linux GOARCH=arm CGO_ENABLED=0 go build -o cmd/e2e/bin/e2e-linux-arm cmd/e2e/main.go
+	GOOS=linux GOARCH=386 CGO_ENABLED=0 go build -o cmd/e2e/bin/e2e-linux-386 cmd/e2e/main.go
 
 app-build: app-compile app-build-bin app-build-docker
