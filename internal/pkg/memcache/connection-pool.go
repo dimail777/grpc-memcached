@@ -64,6 +64,9 @@ func (cp *internalConnectionPool) releaseFailedConnection(conn Connection) {
 	cp.mu.Lock()
 	defer cp.mu.Unlock()
 	_ = conn.close()
-	cp.failedConnections <- conn
+	select {
+	case cp.failedConnections <- conn:
+	default:
+	}
 	cp.createdConnections--
 }
